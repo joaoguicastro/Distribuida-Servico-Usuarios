@@ -1,0 +1,59 @@
+services:
+  servico-usuarios:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: healthsys-servico-usuarios
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: usuarios_db
+      DB_USER: healthsys
+      DB_PASS: healthsys
+      JWT_SECRET: healthsys-jwt-secret-key-deve-ser-trocada-em-producao
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - healthsys-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8084/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: healthsys-postgres-usuarios
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: usuarios_db
+      POSTGRES_USER: healthsys
+      POSTGRES_PASSWORD: healthsys
+    volumes:
+      - postgres-usuarios-data:/var/lib/postgresql/data
+    networks:
+      - healthsys-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U healthsys -d usuarios_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  postgres-usuarios-data:
+    driver: local
+
+networks:
+  healthsys-network:
+    name: healthsys-network
+    driver: bridge
