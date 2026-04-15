@@ -6,7 +6,6 @@ import com.healthsys.usuarios.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class UsuarioService {
 
@@ -16,12 +15,13 @@ public class UsuarioService {
     @Autowired
     private SecurityConfig securityConfig;
 
-    public UsuarioEntity cadastrarUsuario (UsuarioEntity usuario) {
-        String senhaCodificada = securityConfig.passwordEncoder().encode(usuario.getSenha());
-        UsuarioEntity usuarioCadastrado = usuarioRepository.save(usuario);
+    public UsuarioEntity salvarUsuario (UsuarioEntity usuario) {
+        String senha = usuario.getPassword();
 
-        return usuarioCadastrado.toBuilder()
-                .senha(senhaCodificada)
-                .build();
+        String senhaCriptografada = securityConfig.passwordEncoder().encode(senha);
+
+        return usuarioRepository.save(usuario.toBuilder()
+                .password(senhaCriptografada)
+                .build());
     }
 }

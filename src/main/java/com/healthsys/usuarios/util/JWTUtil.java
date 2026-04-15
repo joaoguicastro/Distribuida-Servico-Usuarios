@@ -13,29 +13,30 @@ import java.time.Instant;
 @Component
 public class JWTUtil {
 
-    @Value("{security.token.secret}")
+    @Value("{jwt.secret}")
     private String secretKey;
 
-    public String generateToken (UsuarioEntity usuario) {
+    public String gerarToken (UsuarioEntity usuario) {
+
+        String email = usuario.getEmail();
+
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
-        Instant expiresIn = Instant.now().plus(Duration.ofMinutes(59));
+        Instant expiresIn = Instant.now().plus(Duration.ofHours(2));
 
-        String token = JWT.create()
-                .withIssuer("healthSys")
-                .withSubject(usuario.getNome())
-                .withClaim("role", usuario.getPerfil().name())
+        String tokenGerado = JWT.create()
+                .withSubject(email)
+                .withClaim("role", usuario.getRole().name())
                 .withExpiresAt(expiresIn)
                 .sign(algorithm);
 
-        return token;
+        return tokenGerado;
     }
 
-    public DecodedJWT validateToken(String token) {
+    public DecodedJWT validarToken (String token) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
         return JWT.require(algorithm)
-                .withIssuer("healthSys")
                 .build()
                 .verify(token);
     }

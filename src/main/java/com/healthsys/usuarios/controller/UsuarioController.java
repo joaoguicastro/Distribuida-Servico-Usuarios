@@ -1,5 +1,6 @@
 package com.healthsys.usuarios.controller;
 
+
 import com.healthsys.usuarios.entity.UsuarioEntity;
 import com.healthsys.usuarios.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,9 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping
-    public ResponseEntity<UsuarioEntity> cadastrarUsuario (@RequestBody UsuarioEntity usuario) {
-        UsuarioEntity usuarioCriado = usuarioService.cadastrarUsuario(usuario);
+    @PostMapping("/cadastro")
+    public ResponseEntity<UsuarioEntity> cadastrarUsuario(@RequestBody UsuarioEntity usuarioEntity) {
+        UsuarioEntity usuarioCriado = usuarioService.salvarUsuario(usuarioEntity);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCriado);
     }
