@@ -2,6 +2,7 @@ package com.healthsys.usuarios.controller;
 
 import com.healthsys.usuarios.entity.UsuarioEntity;
 import com.healthsys.usuarios.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,8 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<UsuarioEntity> cadastrarUsuario (@RequestBody UsuarioEntity usuario) {
+    public ResponseEntity<UsuarioEntity> cadastrarUsuario(@Valid @RequestBody UsuarioEntity usuario) {
         UsuarioEntity usuarioCriado = usuarioService.cadastrarUsuario(usuario);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCriado);
     }
 }

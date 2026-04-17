@@ -15,12 +15,25 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class JWTFilter extends OncePerRequestFilter {
 
+    private static final Set<String> PUBLIC_PATHS = Set.of(
+            "/auth/login",
+            "/usuario",
+            "/actuator/health",
+            "/error"
+    );
+
     @Autowired
     private JWTUtil jwtUtil;
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return "OPTIONS".equalsIgnoreCase(request.getMethod()) || PUBLIC_PATHS.contains(request.getServletPath());
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -47,7 +60,9 @@ public class JWTFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
             } catch (Exception e) {
+                response.setContentType("application/json");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"erro\":\"Token JWT invalido ou expirado\"}");
                 return;
             }
         }

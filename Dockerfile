@@ -12,6 +12,7 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
+RUN apk add --no-cache wget
 RUN addgroup -S healthsys && adduser -S healthsys -G healthsys
 USER healthsys
 
