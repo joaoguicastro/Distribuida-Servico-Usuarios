@@ -1,6 +1,6 @@
 package com.healthsys.usuarios.enums;
 
-public enum Perfil {
+public enum Role {
     ADMIN,
     MEDICO,
     PACIENTE

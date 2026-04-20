@@ -17,12 +17,16 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UsuarioEntity cadastrarUsuario(UsuarioEntity usuario) {
+    public UsuarioEntity salvarUsuario(UsuarioEntity usuario) {
         if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ja existe usuario cadastrado com este email");
         }
 
-        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return usuarioRepository.save(usuario);
+    }
+
+    public UsuarioEntity cadastrarUsuario(UsuarioEntity usuario) {
+        return salvarUsuario(usuario);
     }
 }

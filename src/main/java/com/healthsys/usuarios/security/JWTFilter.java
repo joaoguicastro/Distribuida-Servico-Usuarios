@@ -21,8 +21,10 @@ import java.util.Set;
 public class JWTFilter extends OncePerRequestFilter {
 
     private static final Set<String> PUBLIC_PATHS = Set.of(
+            "/auth",
             "/auth/login",
             "/usuario",
+            "/usuario/cadastro",
             "/actuator/health",
             "/error"
     );
@@ -39,18 +41,15 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         String header = request.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
 
             try {
-                DecodedJWT decodedJWT = jwtUtil.validateToken(token);
-
+                DecodedJWT decodedJWT = jwtUtil.validarToken(token);
                 String email = decodedJWT.getSubject();
                 String role = decodedJWT.getClaim("role").asString();
-
                 List<SimpleGrantedAuthority> authorities =
                         List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
@@ -58,7 +57,6 @@ public class JWTFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(email, null, authorities);
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
-
             } catch (Exception e) {
                 response.setContentType("application/json");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

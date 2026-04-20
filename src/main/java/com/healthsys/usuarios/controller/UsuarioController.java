@@ -18,9 +18,9 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping
-    public ResponseEntity<UsuarioEntity> cadastrarUsuario(@Valid @RequestBody UsuarioEntity usuario) {
-        UsuarioEntity usuarioCriado = usuarioService.cadastrarUsuario(usuario);
+    @PostMapping({"", "/cadastro"})
+    public ResponseEntity<UsuarioEntity> cadastrarUsuario(@Valid @RequestBody UsuarioEntity usuarioEntity) {
+        UsuarioEntity usuarioCriado = usuarioService.salvarUsuario(usuarioEntity);
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCriado);
     }
 }
