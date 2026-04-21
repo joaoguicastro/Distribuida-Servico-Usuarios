@@ -19,14 +19,15 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - healthsys-network
+      - healthsys-network-usuarios
     restart: unless-stopped
+    entrypoint: ["sh", "-c", "sleep 10 && java -jar app.jar"]
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8084/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
 
   postgres:
     image: postgres:16-alpine
@@ -40,20 +41,20 @@ services:
     volumes:
       - postgres-usuarios-data:/var/lib/postgresql/data
     networks:
-      - healthsys-network
+      - healthsys-network-usuarios
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U healthsys -d usuarios_db"]
       interval: 10s
       timeout: 5s
       retries: 5
-
+      start_period: 10s
 
 volumes:
   postgres-usuarios-data:
     driver: local
 
 networks:
-  healthsys-network:
-    name: healthsys-network
+  healthsys-network-usuarios:
+    name: healthsys-network-usuarios
     driver: bridge
