@@ -26,7 +26,9 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    public UsuarioEntity cadastrarUsuario(UsuarioEntity usuario) {
-        return salvarUsuario(usuario);
+    public UsuarioEntity buscarPorId(Long id) {
+        return usuarioRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Usuário não encontrado!")
+        );
     }
 }
