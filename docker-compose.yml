@@ -1,0 +1,35 @@
+services:
+  servico-usuarios:
+    build: .
+    container_name: healthsys-servico-usuarios
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - healthsys-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: healthsys-postgres-usuarios
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: usuarios_db
+      POSTGRES_USER: healthsys
+      POSTGRES_PASSWORD: healthsys
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U healthsys -d usuarios_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - healthsys-network
+
+networks:
+  healthsys-network:
+    external: true
