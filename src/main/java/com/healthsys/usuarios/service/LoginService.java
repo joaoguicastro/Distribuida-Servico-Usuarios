@@ -1,7 +1,9 @@
 package com.healthsys.usuarios.service;
 
 import com.healthsys.usuarios.dtos.login.LoginDTO;
+import com.healthsys.usuarios.dtos.login.ResponseLoginDTO;
 import com.healthsys.usuarios.entity.UsuarioEntity;
+import com.healthsys.usuarios.enums.Role;
 import com.healthsys.usuarios.repository.UsuarioRepository;
 import com.healthsys.usuarios.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ public class LoginService {
     @Autowired
     private JWTUtil jwtUtil;
 
-    public String login(LoginDTO loginDTO) {
+    public ResponseLoginDTO login(LoginDTO loginDTO) {
         UsuarioEntity usuario = usuarioRepository.findByEmail(loginDTO.email())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario ou senha invalidos"));
 
@@ -30,6 +32,18 @@ public class LoginService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario ou senha invalidos");
         }
 
-        return jwtUtil.gerarToken(usuario);
+        String token = jwtUtil.gerarToken(usuario);
+        String redirectUrl = resolverRedirectPorPerfil(usuario.getRole());
+
+        return new ResponseLoginDTO(token, usuario.getRole().name(), redirectUrl);
+    }
+
+    private String resolverRedirectPorPerfil(Role role) {
+        return switch (role) {
+            case ADMIN -> "/admin/dashboard";
+            case MEDICO -> "/medico/dashboard";
+            case PACIENTE -> "/paciente/dashboard";
+            case RECEPCIONISTA -> "/recepcionista/dashboard";
+        };
     }
 }
